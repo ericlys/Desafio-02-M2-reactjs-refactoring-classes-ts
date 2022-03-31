@@ -6,19 +6,20 @@ import { Modal } from '../Modal';
 import  { Input }  from '../Input';
 import { FormHandles, SubmitHandler } from '@unform/core';
 import { IFood } from '../../types';
+import { useFoods } from '../../hooks/useFoods';
 
 interface ModalEditFoodProps {
-  editingFood?: IFood;
   isOpen: boolean;
   setIsOpen: () => void;
-  handleUpdateFood: ( food: IFood) => void;
 }
 
-export function ModalEditFood ({ editingFood, isOpen, setIsOpen, handleUpdateFood}: ModalEditFoodProps) {
+export function ModalEditFood ({ isOpen, setIsOpen }: ModalEditFoodProps) {
   const formRef = createRef<FormHandles>();
 
+  const { editingFood, updateFood } = useFoods();
+
   const handleSubmit : SubmitHandler<IFood> = async data  => {
-    handleUpdateFood(data);
+    updateFood(data);
     setIsOpen();
   };
 

@@ -1,34 +1,27 @@
 import { useState } from 'react';
 import { FiEdit3, FiTrash } from 'react-icons/fi';
-import { api } from '../../services/api';
+import { useFoods } from '../../hooks/useFoods';
+import { IFood } from '../../types';
 
 import { Container } from './styles';
-// import api from '../../services/api';
-interface foodInt {
-  id: number;
-  name: string;
-  description: string;
-  price: string;
-  available: boolean;
-  image: string;
-}
-
 interface FoodProps {
-  food: foodInt;
-  handleDelete: (id: number) => void;
-  handleEditFood: (food: foodInt) => void;
+  food: IFood;
+  handleEditFood: (openModal: boolean) => void;
 }
 
-export function Food({food, handleDelete, handleEditFood}: FoodProps){
+export function Food({food, handleEditFood}: FoodProps){
   const [isAvailable, setIsAvailable] = useState(food.available);
 
-    const toggleAvailable = async () => {
-      await api.put(`/foods/${food.id}`, {
-        ...food,
-        available: !isAvailable,
-      });
+  const { deleteFood, setEditingFood, toggleAvailable } = useFoods();
 
+    const toggle = async () => {
+      toggleAvailable(food);
       setIsAvailable(!isAvailable);
+    }
+
+    const handleEdit = (food: IFood) => {
+      setEditingFood(food);
+      handleEditFood(true);
     }
 
     return (
@@ -48,7 +41,7 @@ export function Food({food, handleDelete, handleEditFood}: FoodProps){
             <button
               type="button"
               className="icon"
-              onClick={() => handleEditFood(food)}
+              onClick={() => handleEdit(food)}
               data-testid={`edit-food-${food.id}`}
             >
               <FiEdit3 size={20} />
@@ -57,7 +50,7 @@ export function Food({food, handleDelete, handleEditFood}: FoodProps){
             <button
               type="button"
               className="icon"
-              onClick={() => handleDelete(food.id)}
+              onClick={() => deleteFood(food.id)}
               data-testid={`remove-food-${food.id}`}
             >
               <FiTrash size={20} />
@@ -72,7 +65,7 @@ export function Food({food, handleDelete, handleEditFood}: FoodProps){
                 id={`available-switch-${food.id}`}
                 type="checkbox"
                 checked={isAvailable}
-                onChange={toggleAvailable}
+                onChange={toggle}
                 data-testid={`change-status-food-${food.id}`}
               />
               <span className="slider" />
